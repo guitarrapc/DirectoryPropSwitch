@@ -85,15 +85,15 @@ namespace DirectoryPropSwitch.internals
 
         public static string TrimEnd(ReadOnlySpan<char> span, string line)
         {
-            if (((byte)line[line.Length - 1]) == 13)
+            if (((byte)line[^1]) == 13)
             {
                 // cr
                 var result = span.Slice(0, span.Length).ToString();
                 return result;
             }
-            else if (((byte)line[line.Length - 1]) == 10)
+            else if (((byte)line[^1]) == 10)
             {
-                if (((byte)line[line.Length - 2]) == 13)
+                if (((byte)line[^2]) == 13)
                 {
                     // crlf
                     var result = span.Slice(0, span.Length - 1).ToString();
@@ -115,15 +115,15 @@ namespace DirectoryPropSwitch.internals
         public static string AddLast(string path, ReadOnlySpan<char> span, string line)
         {
             var eol = Detect(path).GetLabel();
-            if (((byte)line[line.Length - 1]) == 13)
+            if (((byte)line[^1]) == 13)
             {
                 // cr
                 var result = span.Slice(0, span.Length).ToString() + eol;
                 return result;
             }
-            else if (((byte)line[line.Length - 1]) == 10)
+            else if (((byte)line[^1]) == 10)
             {
-                if (((byte)line[line.Length - 2]) == 13)
+                if (((byte)line[^2]) == 13)
                 {
                     // crlf
                     var result = span.Slice(0, span.Length - 1).ToString() + eol;
