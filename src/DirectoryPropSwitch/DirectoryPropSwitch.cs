@@ -49,37 +49,41 @@ namespace DirectoryPropSwitch
             {
                 var path = paths[i];
                 var current = $"{i + 1}/{paths.Length}";
+                var content = await File.ReadAllTextAsync(path);
 
-                var original = await File.ReadAllTextAsync(path);
-                var search = xmlPropLineRegEx.Match(original);
-                if (!search.Success)
-                {
-                    _logger.LogInformation($"#{current}; {_settings.XmlKey} not detected; {nameof(path)}={path}");
-                    continue;
-                }
-
-                var isCommented = IsCommented(search.Value);
-                if (isCommented)
-                {
-                    _logger.LogInformation($"#{current}; {_settings.XmlKey} already disabled; {nameof(path)}={path}");
-                    continue;
-                }
-
-                var replaced = AddCommentElement(original, _settings.XmlKey, search.Value);
-                if (string.IsNullOrWhiteSpace(replaced))
-                {
-                    _logger.LogInformation($"#{current}; {_settings.XmlKey} not detected; {nameof(path)}={path}");
-                    continue;
-                }
-                if (!IsChanged(original, replaced))
-                {
-                    _logger.LogInformation($"#{current}; nothing changed, skip; {nameof(path)}={path}");
-                    continue;
-                }
-
-                _logger.LogInformation($"#{current}; disabling {_settings.XmlKey}; {nameof(path)}={path}");
-                Save(path, replaced, isDryrun);
+                _logger.LogInformation($"#{current}; disabling {nameof(path)}={path}");
+                await DisableAsync(content, path, isDryrun);
             }
+        }
+        public async ValueTask DisableAsync(string content, string path, bool isDryrun)
+        {
+            var search = xmlPropLineRegEx.Match(content);
+            if (!search.Success)
+            {
+                _logger.LogInformation($"{_settings.XmlKey} not detected.");
+                return;
+            }
+
+            var isCommented = IsCommented(search.Value);
+            if (isCommented)
+            {
+                _logger.LogInformation($"{_settings.XmlKey} already disabled.");
+                return;
+            }
+
+            var replaced = AddCommentElement(content, _settings.XmlKey, search.Value);
+            if (string.IsNullOrWhiteSpace(replaced))
+            {
+                _logger.LogInformation($"{_settings.XmlKey} not detected.");
+                return;
+            }
+            if (!IsChanged(content, replaced))
+            {
+                _logger.LogInformation($"{_settings.XmlKey} nothing changed, skip.");
+                return;
+            }
+
+            Save(path, replaced, isDryrun);
         }
 
         public async ValueTask EnableAsync(string basePath, bool isDryrun)
@@ -89,37 +93,41 @@ namespace DirectoryPropSwitch
             {
                 var path = paths[i];
                 var current = $"{i + 1}/{paths.Length}";
+                var content = await File.ReadAllTextAsync(path);
 
-                var original = await File.ReadAllTextAsync(path);
-                var search = xmlPropLineRegEx.Match(original);
-                if (!search.Success)
-                {
-                    _logger.LogInformation($"#{current}; {_settings.XmlKey} not detected; {nameof(path)}={path}");
-                    continue;
-                }
-
-                var isCommented = IsCommented(search.Value);
-                if (!isCommented)
-                {
-                    _logger.LogInformation($"#{current}; {_settings.XmlKey} already disabled; {nameof(path)}={path}");
-                    continue;
-                }
-
-                var replaced = RemoveCommentElement(original, search.Value);
-                if (string.IsNullOrWhiteSpace(replaced))
-                {
-                    _logger.LogInformation($"#{current}; {_settings.XmlKey} not detected; {nameof(path)}={path}");
-                    continue;
-                }
-                if (!IsChanged(original, replaced))
-                {
-                    _logger.LogInformation($"#{current}; nothing changed, skip; {nameof(path)}={path}");
-                    continue;
-                }
-
-                _logger.LogInformation($"#{current}; enabling {_settings.XmlKey}; {nameof(path)}={path}");
-                Save(path, replaced, isDryrun);
+                _logger.LogInformation($"#{current}; enabling {nameof(path)}={path}");
+                await EnableAsync(content, path, isDryrun);
             }
+        }
+        public async ValueTask EnableAsync(string content, string path, bool isDryrun)
+        {
+            var search = xmlPropLineRegEx.Match(content);
+            if (!search.Success)
+            {
+                _logger.LogInformation($"{_settings.XmlKey} not detected.");
+                return;
+            }
+
+            var isCommented = IsCommented(search.Value);
+            if (!isCommented)
+            {
+                _logger.LogInformation($"{_settings.XmlKey} already enabled.");
+                return;
+            }
+
+            var replaced = RemoveCommentElement(content, search.Value);
+            if (string.IsNullOrWhiteSpace(replaced))
+            {
+                _logger.LogInformation($"{_settings.XmlKey} not detected.");
+                return;
+            }
+            if (!IsChanged(content, replaced))
+            {
+                _logger.LogInformation($"{_settings.XmlKey} nothing changed, skip.");
+                return;
+            }
+
+            Save(path, replaced, isDryrun);
         }
 
         public async ValueTask ToggleAsync(string basePath, bool isDryrun)
@@ -129,40 +137,45 @@ namespace DirectoryPropSwitch
             {
                 var path = paths[i];
                 var current = $"{i + 1}/{paths.Length}";
+                var content = await File.ReadAllTextAsync(path);
 
-                var original = await File.ReadAllTextAsync(path);
-                var search = xmlPropLineRegEx.Match(original);
-                if (!search.Success)
-                {
-                    _logger.LogInformation($"#{current}; {_settings.XmlKey} not detected; {nameof(path)}={path}");
-                    continue;
-                }
-
-                var isCommented = IsCommented(search.Value);
-                var replaced = isCommented
-                    ? RemoveCommentElement(original, search.Value)
-                    : AddCommentElement(original, _settings.XmlKey, search.Value);
-                if (string.IsNullOrWhiteSpace(replaced))
-                {
-                    _logger.LogInformation($"#{current}; {_settings.XmlKey} not detected; {nameof(path)}={path}");
-                    continue;
-                }
-                if (!IsChanged(original, replaced))
-                {
-                    _logger.LogInformation($"#{current}; nothing changed, skip; {nameof(path)}={path}");
-                    continue;
-                }
-
-                if (isCommented)
-                {
-                    _logger.LogInformation($"#{current}; disabling {_settings.XmlKey}; {nameof(path)}={path}");
-                }
-                else
-                {
-                    _logger.LogInformation($"#{current}; enabling {_settings.XmlKey}; {nameof(path)}={path}");
-                }
-                Save(path, replaced, isDryrun);
+                _logger.LogInformation($"#{current}; toggling {nameof(path)}={path}");
+                await ToggleAsync(content, path, isDryrun);
             }
+        }
+        public async ValueTask ToggleAsync(string content, string path, bool isDryrun)
+        {
+            var search = xmlPropLineRegEx.Match(content);
+            if (!search.Success)
+            {
+                _logger.LogInformation($"{_settings.XmlKey} not detected.");
+                return;
+            }
+
+            var isCommented = IsCommented(search.Value);
+            var replaced = isCommented
+                ? RemoveCommentElement(content, search.Value)
+                : AddCommentElement(content, _settings.XmlKey, search.Value);
+            if (string.IsNullOrWhiteSpace(replaced))
+            {
+                _logger.LogInformation($"{_settings.XmlKey} not detected.");
+                return;
+            }
+            if (!IsChanged(content, replaced))
+            {
+                _logger.LogInformation($"{_settings.XmlKey} nothing changed, skip.");
+                return;
+            }
+
+            if (isCommented)
+            {
+                _logger.LogInformation($"toggle disabling {_settings.XmlKey}.");
+            }
+            else
+            {
+                _logger.LogInformation($"toggle enabling {_settings.XmlKey}.");
+            }
+            Save(path, replaced, isDryrun);
         }
 
         private string RemoveCommentElement(string contents, string sentence)
