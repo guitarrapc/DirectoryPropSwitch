@@ -14,8 +14,14 @@ namespace DirectoryPropSwitch
 
     public class PathMapBatch :BatchBase
     {
+        private readonly ILogger<BatchEngine> _logger;
+        public PathMapBatch(ILogger<BatchEngine> logger)
+        {
+            _logger = logger;
+        }
+
         [Command("version")]
-        public void Version() => Context.Logger.LogInformation($"version: {Assembly.GetEntryAssembly().GetName().Version.ToString()}");
+        public void Version() => _logger.LogInformation($"version: {Assembly.GetEntryAssembly().GetName().Version.ToString()}");
 
         [Command("enable", "enable key in Directory.Build.Prop")]
         public async Task Enable(
@@ -25,11 +31,11 @@ namespace DirectoryPropSwitch
             [Option("-r", "Use for find file for directory recursively.")]bool recursive = true, 
             [Option("-dry", "Use for dry run.")]bool dryRun = true)
         {
-            Context.Logger.LogDebug($"Parameter -{nameof(key)}={key}");
-            Context.Logger.LogDebug($"Parameter -{nameof(path)}={path}");
-            Context.Logger.LogDebug($"Parameter -{nameof(fileName)}={fileName}");
-            Context.Logger.LogDebug($"Parameter -{nameof(recursive)}={recursive}");
-            Context.Logger.LogDebug($"Parameter -{nameof(dryRun)}={dryRun}");
+            _logger.LogDebug($"Parameter -{nameof(key)}={key}");
+            _logger.LogDebug($"Parameter -{nameof(path)}={path}");
+            _logger.LogDebug($"Parameter -{nameof(fileName)}={fileName}");
+            _logger.LogDebug($"Parameter -{nameof(recursive)}={recursive}");
+            _logger.LogDebug($"Parameter -{nameof(dryRun)}={dryRun}");
 
             var settings = new DirectoryPropSwitchSettings()
             {
@@ -37,7 +43,7 @@ namespace DirectoryPropSwitch
                 FileName = fileName,
                 SearchOption = recursive ? System.IO.SearchOption.AllDirectories : System.IO.SearchOption.TopDirectoryOnly,
             };
-            var switcher = new DirectoryPropSwitch(settings, Context.Logger);
+            var switcher = new DirectoryPropSwitch(settings, _logger);
             await switcher.EnableAsync(path, dryRun);
         }
 
@@ -49,11 +55,11 @@ namespace DirectoryPropSwitch
             [Option("-r", "Use for find file for directory recursively.")]bool recursive = true,
             [Option("-dry", "Use for dry run.")]bool dryRun = true)
         {
-            Context.Logger.LogDebug($"Parameter -{nameof(key)}={key}");
-            Context.Logger.LogDebug($"Parameter -{nameof(path)}={path}");
-            Context.Logger.LogDebug($"Parameter -{nameof(fileName)}={fileName}");
-            Context.Logger.LogDebug($"Parameter -{nameof(recursive)}={recursive}");
-            Context.Logger.LogDebug($"Parameter -{nameof(dryRun)}={dryRun}");
+            _logger.LogDebug($"Parameter -{nameof(key)}={key}");
+            _logger.LogDebug($"Parameter -{nameof(path)}={path}");
+            _logger.LogDebug($"Parameter -{nameof(fileName)}={fileName}");
+            _logger.LogDebug($"Parameter -{nameof(recursive)}={recursive}");
+            _logger.LogDebug($"Parameter -{nameof(dryRun)}={dryRun}");
 
             var settings = new DirectoryPropSwitchSettings()
             {
@@ -61,7 +67,7 @@ namespace DirectoryPropSwitch
                 FileName = fileName,
                 SearchOption = recursive ? System.IO.SearchOption.AllDirectories : System.IO.SearchOption.TopDirectoryOnly,
             };
-            var switcher = new DirectoryPropSwitch(settings, Context.Logger);
+            var switcher = new DirectoryPropSwitch(settings, _logger);
             await switcher.DisableAsync(path, dryRun);
         }
 
@@ -73,11 +79,11 @@ namespace DirectoryPropSwitch
             [Option("-r", "Use for find file for directory recursively.")]bool recursive = true,
             [Option("-dry", "Use for dry run.")]bool dryRun = true)
         {
-            Context.Logger.LogDebug($"Parameter -{nameof(key)}={key}");
-            Context.Logger.LogDebug($"Parameter -{nameof(path)}={path}");
-            Context.Logger.LogDebug($"Parameter -{nameof(fileName)}={fileName}");
-            Context.Logger.LogDebug($"Parameter -{nameof(recursive)}={recursive}");
-            Context.Logger.LogDebug($"Parameter -{nameof(dryRun)}={dryRun}");
+            _logger.LogDebug($"Parameter -{nameof(key)}={key}");
+            _logger.LogDebug($"Parameter -{nameof(path)}={path}");
+            _logger.LogDebug($"Parameter -{nameof(fileName)}={fileName}");
+            _logger.LogDebug($"Parameter -{nameof(recursive)}={recursive}");
+            _logger.LogDebug($"Parameter -{nameof(dryRun)}={dryRun}");
 
             var settings = new DirectoryPropSwitchSettings()
             {
@@ -85,7 +91,7 @@ namespace DirectoryPropSwitch
                 FileName = fileName,
                 SearchOption = recursive ? System.IO.SearchOption.AllDirectories : System.IO.SearchOption.TopDirectoryOnly,
             };
-            var switcher = new DirectoryPropSwitch(settings, Context.Logger);
+            var switcher = new DirectoryPropSwitch(settings, _logger);
             await switcher.ToggleAsync(path, dryRun);
         }
     }
