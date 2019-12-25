@@ -13,23 +13,6 @@ namespace DirectoryPropSwitch.Tests
     /// </summary>
     public class DirectoryPropSwitchEnableTests : IClassFixture<TestFixture>
     {
-        private readonly string[] enableData = new[] {
-                "<Project>",
-                "  <PropertyGroup>",
-                "    <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))</RepoRoot>",
-                "    <PathMap>$(RepoRoot)=.</PathMap>",
-                "  </PropertyGroup>",
-                "</Project>",
-            };
-        private readonly string[] disableData = new[] {
-                "<Project>",
-                "  <PropertyGroup>",
-                "    <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))</RepoRoot>",
-                "    <!-- <PathMap>$(RepoRoot)=.</PathMap> -->",
-                "  </PropertyGroup>",
-                "</Project>",
-            };
-
         private readonly TestFixture _fixture;
         private readonly ILogger _logger;
 
@@ -42,11 +25,11 @@ namespace DirectoryPropSwitch.Tests
         [Fact]
         public async Task EnablePathMapTest()
         {
-            var shouldBe = _fixture.CreateDirectoryBuildProp(string.Join('\n', enableData), $"{nameof(EnablePathMapTest)}_expected");
+            var shouldBe = _fixture.CreateDirectoryBuildProp(string.Join('\n', TestData.EnableData), $"{nameof(EnablePathMapTest)}_expected");
             var expected = _fixture.Read(shouldBe);
 
             var fileName = $"{nameof(EnablePathMapTest)}_actual";
-            var testPath = _fixture.CreateDirectoryBuildProp(string.Join('\n', disableData), fileName);
+            var testPath = _fixture.CreateDirectoryBuildProp(string.Join('\n', TestData.DisableData), fileName);
             var settings = new DirectoryPropSwitchSettings()
             {
                 SearchOption = SearchOption.TopDirectoryOnly,
@@ -64,11 +47,11 @@ namespace DirectoryPropSwitch.Tests
         [Fact]
         public async Task EnablePathMapDryRunTest()
         {
-            var shouldBe = _fixture.CreateDirectoryBuildProp(string.Join('\n', disableData), $"{nameof(EnablePathMapDryRunTest)}_expected");
+            var shouldBe = _fixture.CreateDirectoryBuildProp(string.Join('\n', TestData.DisableData), $"{nameof(EnablePathMapDryRunTest)}_expected");
             var expected = _fixture.Read(shouldBe);
 
             var fileName = $"{nameof(EnablePathMapDryRunTest)}_actual";
-            var testPath = _fixture.CreateDirectoryBuildProp(string.Join('\n', disableData), fileName);
+            var testPath = _fixture.CreateDirectoryBuildProp(string.Join('\n', TestData.DisableData), fileName);
             var settings = new DirectoryPropSwitchSettings()
             {
                 SearchOption = SearchOption.TopDirectoryOnly,
