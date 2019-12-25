@@ -12,16 +12,16 @@ namespace DirectoryPropSwitch
 {
     public class DirectoryPropSwitchSettings
     {
-        public string XmlKey { get; set; }
+        public string? XmlKey { get; set; }
         public string FileName { get; set; } = "Directory.Build.props";
         public SearchOption SearchOption { get; set; } = SearchOption.AllDirectories;
     }
 
     public class DirectoryPropSwitch
     {
-        private static readonly string xmlCommentOutPattern = @"<!--.*-->";
+        private const string xmlCommentOutPattern = @"<!--.*-->";
         private static readonly Regex xmlCommentOutRegEx = new Regex(xmlCommentOutPattern, RegexOptions.Multiline | RegexOptions.CultureInvariant);
-        private static readonly string xmlCommentSectionPattern = @"(<!--\s*)(<.*>)(\s*-->)";
+        private const string xmlCommentSectionPattern = @"(<!--\s*)(<.*>)(\s*-->)";
         private static readonly Regex xmlCommentSectionRegEx = new Regex(xmlCommentSectionPattern, RegexOptions.Multiline | RegexOptions.CultureInvariant);
 
         private readonly Regex xmlPropLineRegEx;
@@ -32,6 +32,8 @@ namespace DirectoryPropSwitch
 
         public DirectoryPropSwitch(DirectoryPropSwitchSettings settings, ILogger logger)
         {
+            if (settings.XmlKey == null) throw new ArgumentNullException(nameof(settings.XmlKey));
+
             _settings = settings;
             _logger = logger;
 
@@ -71,7 +73,7 @@ namespace DirectoryPropSwitch
                 return;
             }
 
-            var replaced = AddCommentElement(content, _settings.XmlKey, search.Value);
+            var replaced = AddCommentElement(content, _settings.XmlKey!, search.Value);
             if (string.IsNullOrWhiteSpace(replaced))
             {
                 _logger.LogInformation($"{_settings.XmlKey} not detected.");
@@ -155,7 +157,7 @@ namespace DirectoryPropSwitch
             var isCommented = IsCommented(search.Value);
             var replaced = isCommented
                 ? RemoveCommentElement(content, search.Value)
-                : AddCommentElement(content, _settings.XmlKey, search.Value);
+                : AddCommentElement(content, _settings.XmlKey!, search.Value);
             if (string.IsNullOrWhiteSpace(replaced))
             {
                 _logger.LogInformation($"{_settings.XmlKey} not detected.");
