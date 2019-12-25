@@ -21,7 +21,7 @@ namespace DirectoryPropSwitch
         }
 
         [Command("version")]
-        public void Version() => _logger.LogInformation($"version: {Assembly.GetEntryAssembly().GetName().Version.ToString()}");
+        public void Version() => _logger.LogInformation($"version: {Assembly.GetEntryAssembly()!.GetName().Version!.ToString()}");
 
         [Command("enable", "enable key in Directory.Build.Prop")]
         public async Task Enable(
