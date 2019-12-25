@@ -3,10 +3,42 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Nullable>enable</Nullable>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(PublishSingleFile)' != 'true'">
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackAsTool>true</PackAsTool>
+    <PackageId>DirectoryPropSwitch</PackageId>
+    <ToolCommandName>dotnet-directorypropswitch</ToolCommandName>
+    <Authors>guitarrapc</Authors>
+    <Company>guitarrapc</Company>
+    <Copyright>guitarrapc</Copyright>
+    <Description>enable/disable Directory.Build.props element</Description>
+    <PackageProjectUrl>https://github.com/guitarrapc/DirectoryPropSwitch</PackageProjectUrl>
+    <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Directory.Build.props</PackageTags>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(PublishSingleFile)' == 'true'">
+    <AssemblyName>DirectoryPropSwitch_$(RuntimeIdentifier)_$(Version)</AssemblyName>
+    <PublishSingleFile>true</PublishSingleFile>
+    <PublishTrimmed>true</PublishTrimmed>
+    <IncludeSymbolsInSingleFile>true</IncludeSymbolsInSingleFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="MicroBatchFramework" Version="1.6.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
